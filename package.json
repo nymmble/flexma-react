@@ -1,5 +1,5 @@
 {
-  "name": "flexma",
+  "name": "flexma-react",
   "version": "0.0.1",
   "description": "React layout components to make implementing Figma designs easy",
   "scripts": {
