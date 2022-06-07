@@ -1,0 +1,28 @@
+{
+  "name": "flexma",
+  "version": "0.0.1",
+  "description": "React layout components to make implementing Figma designs easy",
+  "scripts": {
+    "build": "tsc --project ./tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "react",
+    "figma",
+    "flexbox",
+    "flex"
+  ],
+  "author": "nymmble inc.",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.7.3"
+  },
+  "peerDependencies": {
+    "react": "^18.1.0"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ]
+}
