@@ -1,7 +1,7 @@
 {
   "name": "flexma-react",
-  "version": "0.0.1",
-  "description": "React layout components to make implementing Figma designs easy",
+  "version": "0.0.2",
+  "description": "React layout components to make implementing Figma auto layout designs quicker and easier",
   "scripts": {
     "build": "tsc --project ./tsconfig.json",
     "test": "jest"
