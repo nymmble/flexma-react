@@ -49,7 +49,7 @@ The above code would render this simple example that includes a column layout wi
 
 When working through our own projects, we saw an opportunity to better align the way we were turning Figma designs into React code. We wanted to avoid having our developers trying to replicate designs by "eyeballing it", and instead provide a more programmatic way to move from design to code.
 
-[Figma's auto layout](https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties) feature is a pretty close approximation of the way [CSS flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Basic_Concepts_of_Flexbox) works, so we built the **flexma-react** components to allow a developer to look at the specifications of a Figma mock up and easily implement that design in React.
+[Figma's auto layout](https://help.figma.com/hc/en-us/articles/360040451373-Explore-auto-layout-properties) feature is a pretty close approximation of the way [CSS flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Basic_Concepts_of_Flexbox) works, so we built the **flexma-react** components to compliment this method of laying out UI elements -- **flexma-react** abstracts away the flexbox details to allow a developer to look at the specifications of a Figma mock up and easily implement it in React.
 
 ## 3. Examples
 
