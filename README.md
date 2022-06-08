@@ -1,4 +1,4 @@
-## **flexma-react** is a set of React components that use flexbox CSS to replicate Figma's auto layout functionality as closely as possible. flexma-react facilitates going from Figma design to React implementation as quickly as easily as possible.
+## **flexma-react** a set of React components that enable you to go from Figma design to React code quickly and easily.
 
 <br />
 <br />
