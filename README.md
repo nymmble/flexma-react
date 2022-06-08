@@ -1,4 +1,4 @@
-## **flexma-react** a set of React components that enable you to go from Figma design to React code quickly and easily.
+## **flexma-react** is a set of React components that enable you to go from Figma design to React code quickly and easily.
 
 <br />
 <br />
