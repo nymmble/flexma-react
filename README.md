@@ -5,8 +5,6 @@
 
 ## Table of Contents
 
-- [**flexma-react** is a set of React components that enable you to go from Figma design to React code quickly and easily.](#flexma-react-is-a-set-of-react-components-that-enable-you-to-go-from-figma-design-to-react-code-quickly-and-easily)
-- [Table of Contents](#table-of-contents)
 - [1. Installation](#1-installation)
 - [2. Motivation](#2-motivation)
 - [3. Examples](#3-examples)
