@@ -1,19 +1,33 @@
 {
   "name": "flexma-react",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "React layout components to make implementing Figma auto layout designs quicker and easier",
   "scripts": {
     "build": "tsc --project ./tsconfig.json",
     "test": "jest"
   },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "author": "nymmble inc.",
+  "license": "MIT",
   "keywords": [
     "react",
     "figma",
     "flexbox",
-    "flex"
+    "flex",
+    "autolayout"
   ],
-  "author": "nymmble inc.",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nymmble/flexma-react.git"
+  },
+  "homepage": "https://github.com/nymmble/flexma-react#readme",
+  "bugs": {
+    "url": "https://github.com/nymmble/flexma-react/issues"
+  },
   "devDependencies": {
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-react": "^7.17.12",
@@ -27,10 +41,5 @@
   },
   "peerDependencies": {
     "react": "^18.1.0"
-  },
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "files": [
-    "lib/**/*"
-  ]
+  }
 }
