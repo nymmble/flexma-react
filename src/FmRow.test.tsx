@@ -5,9 +5,10 @@ import TestRenderer, { act } from 'react-test-renderer';
 import { FmRow } from './FmRow';
 
 describe('<FmRow />', () => {
-  describe('flex behavior', () => {
-    let renderer: TestRenderer.ReactTestRenderer;
+  /** This will hold the test renderer created instance of the component for each test. */
+  let renderer: TestRenderer.ReactTestRenderer;
 
+  describe('flex behavior', () => {
     it('should use a row layout', () => {
       act(() => {
         // We create the instance within an `act` because of FmRow's useEffect.
@@ -189,17 +190,152 @@ describe('<FmRow />', () => {
         expect(childDiv.props.style?.width).toBe(newWidth);
       });
     });
+
+    describe('spacing between children', () => {
+      let instance: TestRenderer.ReactTestRenderer;
+
+      it('children should have no left margins by default', () => {
+        act(() => {
+          instance = TestRenderer.create(
+            <FmRow gap={10}>
+              <div></div>
+              <p>Hello</p>
+              <div></div>
+            </FmRow>
+          );
+        });
+        const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        // Assert
+        try {
+          tree.children?.forEach((child) => {
+            expect(
+              (child as TestRenderer.ReactTestRendererJSON).props.style?.marginLeft
+            ).toBeFalsy();
+          });
+        } catch {
+          throw new Error('No children found.');
+        }
+      });
+
+      it('children should have right margins except on the last child by default', () => {
+        const gap = 10;
+
+        act(() => {
+          instance = TestRenderer.create(
+            <FmRow gap={gap}>
+              <div></div>
+              <p>Hello</p>
+              <div></div>
+            </FmRow>
+          );
+        });
+        const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        // Assert
+        expect(allHaveRightMarginsExceptLastChild(tree.children, gap)).toBeTruthy();
+      });
+
+      it('children should have half gap left and half gap right on each child for hCenter', () => {
+        const gap = 10;
+        act(() => {
+          instance = TestRenderer.create(
+            <FmRow hCenter gap={gap}>
+              <div></div>
+              <p>Hello</p>
+              <div></div>
+            </FmRow>
+          );
+        });
+        const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        // Assert
+        tree.children?.forEach((child, i) => {
+          child = child as TestRenderer.ReactTestRendererJSON;
+          expect(child.props.style?.marginLeft).toBe(gap / 2);
+          expect(child.props.style?.marginRight).toBe(gap / 2);
+        });
+      });
+
+      it('children should have half gap left and half gap right on each child for hSpaceAround', () => {
+        const gap = 10;
+        act(() => {
+          instance = TestRenderer.create(
+            <FmRow hSpaceAround gap={gap}>
+              <div></div>
+              <p>Hello</p>
+              <div></div>
+            </FmRow>
+          );
+        });
+        const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        // Assert
+        tree.children?.forEach((child, i) => {
+          child = child as TestRenderer.ReactTestRendererJSON;
+          expect(child.props.style?.marginLeft).toBe(gap / 2);
+          expect(child.props.style?.marginRight).toBe(gap / 2);
+        });
+      });
+
+      it(`children should have half gap left and half gap right on each child for hSpaceBetween, but
+    no outer margins on the first and last children`, () => {
+        const gap = 10;
+        act(() => {
+          instance = TestRenderer.create(
+            <FmRow hSpaceBetween gap={gap}>
+              <div></div>
+              <p>Hello</p>
+              <div></div>
+            </FmRow>
+          );
+        });
+        const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        // Assert
+        const firstChild = (
+          tree.children?.slice() as TestRenderer.ReactTestRendererNode[]
+        )?.shift() as TestRenderer.ReactTestRendererJSON;
+        expect(firstChild.props.style.marginLeft).toBeFalsy();
+
+        const lastChild = (
+          tree.children?.slice() as TestRenderer.ReactTestRendererNode[]
+        )?.pop() as TestRenderer.ReactTestRendererJSON;
+        expect(lastChild.props.style?.marginLeft).toBe(gap / 2);
+        expect(lastChild.props.style?.marginRight).toBeFalsy();
+
+        expect(allMiddleSiblingsHaveStyle(tree.children, 'marginLeft', gap / 2)).toBeTruthy();
+        expect(allMiddleSiblingsHaveStyle(tree.children, 'marginRight', gap / 2)).toBeTruthy();
+      });
+
+      it(`children should have left margins (except for first child) and no right margins on all
+    children for hRight`, () => {
+        const gap = 10;
+        act(() => {
+          instance = TestRenderer.create(
+            <FmRow hRight gap={gap}>
+              <div></div>
+              <p>Hello</p>
+              <div></div>
+            </FmRow>
+          );
+        });
+        const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        // Assert
+        expect(noRightMargins(tree.children)).toBeTruthy();
+        expect(allHaveLeftMarginsExceptFirstChild(tree.children, gap)).toBeTruthy();
+      });
+    });
   });
 
-  describe('inputs', () => {
-    let instance: TestRenderer.ReactTestRenderer;
-
+  describe('inputs to the component', () => {
     it('should support having no children', () => {
       act(() => {
         // We create the instance within an `act` because of FmRow's useEffect.
-        instance = TestRenderer.create(<FmRow></FmRow>);
+        renderer = TestRenderer.create(<FmRow></FmRow>);
       });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
 
       expect(tree.children).toBeFalsy();
     });
@@ -207,14 +343,14 @@ describe('<FmRow />', () => {
     it('should support passed in contents as children', () => {
       act(() => {
         // We create the instance within an `act` because of FmRow's useEffect.
-        instance = TestRenderer.create(
+        renderer = TestRenderer.create(
           <FmRow>
             foo
             <div></div>
           </FmRow>
         );
       });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
 
       expect(tree.children?.length).toBe(2);
     });
@@ -223,161 +359,47 @@ describe('<FmRow />', () => {
       // Override - It wouldn't actually make sense to override the flexDirection this way,
       // this is just a test to ensure default styles can be overwritten.
       act(() => {
-        instance = TestRenderer.create(<FmRow style={{ flexDirection: 'column' }}></FmRow>);
+        renderer = TestRenderer.create(<FmRow style={{ flexDirection: 'column' }}></FmRow>);
       });
-      const newTree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+      const newTree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
 
       expect(newTree.props.style.flexDirection).toBe('column');
     });
 
     it('should not overwrite defaults for styles that were not passed in', () => {
       act(() => {
-        instance = TestRenderer.create(<FmRow style={{ flexDirection: 'column' }}></FmRow>);
+        renderer = TestRenderer.create(<FmRow style={{ flexDirection: 'column' }}></FmRow>);
       });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
 
       expect(tree.props.style.flexWrap).toBe('wrap');
     });
-  });
 
-  describe('child spacing', () => {
-    let instance: TestRenderer.ReactTestRenderer;
-
-    it('children should have no left margins by default', () => {
-      act(() => {
-        instance = TestRenderer.create(
-          <FmRow gap={10}>
-            <div></div>
-            <p>Hello</p>
-            <div></div>
-          </FmRow>
-        );
-      });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      // Assert
-      try {
-        tree.children?.forEach((child) => {
-          expect((child as TestRenderer.ReactTestRendererJSON).props.style?.marginLeft).toBeFalsy();
+    describe('props', () => {
+      it('should not specify a className prop if none was passed in', () => {
+        act(() => {
+          renderer = TestRenderer.create(<FmRow></FmRow>);
         });
-      } catch {
-        throw new Error('No children found.');
-      }
-    });
+        const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
 
-    it('children should have right margins except on the last child by default', () => {
-      const gap = 10;
-
-      act(() => {
-        instance = TestRenderer.create(
-          <FmRow gap={gap}>
-            <div></div>
-            <p>Hello</p>
-            <div></div>
-          </FmRow>
-        );
+        expect(tree.props.className).not.toBeDefined();
       });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
 
-      // Assert
-      expect(allHaveRightMarginsExceptLastChild(tree.children, gap)).toBeTruthy();
-    });
+      it('should use the passed in className prop', () => {
+        const customClassName = 'myClass';
 
-    it('children should have half gap left and half gap right on each child for hCenter', () => {
-      const gap = 10;
-      act(() => {
-        instance = TestRenderer.create(
-          <FmRow hCenter gap={gap}>
-            <div></div>
-            <p>Hello</p>
-            <div></div>
-          </FmRow>
-        );
+        act(() => {
+          renderer = TestRenderer.create(<FmRow className={customClassName}></FmRow>);
+        });
+        const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        expect(tree.props.className).toBeDefined();
+        expect(tree.props.className).toBe(customClassName);
       });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      // Assert
-      tree.children?.forEach((child, i) => {
-        child = child as TestRenderer.ReactTestRendererJSON;
-        expect(child.props.style?.marginLeft).toBe(gap / 2);
-        expect(child.props.style?.marginRight).toBe(gap / 2);
-      });
-    });
-
-    it('children should have half gap left and half gap right on each child for hSpaceAround', () => {
-      const gap = 10;
-      act(() => {
-        instance = TestRenderer.create(
-          <FmRow hSpaceAround gap={gap}>
-            <div></div>
-            <p>Hello</p>
-            <div></div>
-          </FmRow>
-        );
-      });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      // Assert
-      tree.children?.forEach((child, i) => {
-        child = child as TestRenderer.ReactTestRendererJSON;
-        expect(child.props.style?.marginLeft).toBe(gap / 2);
-        expect(child.props.style?.marginRight).toBe(gap / 2);
-      });
-    });
-
-    it(`children should have half gap left and half gap right on each child for hSpaceBetween, but
-  no outer margins on the first and last children`, () => {
-      const gap = 10;
-      act(() => {
-        instance = TestRenderer.create(
-          <FmRow hSpaceBetween gap={gap}>
-            <div></div>
-            <p>Hello</p>
-            <div></div>
-          </FmRow>
-        );
-      });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      // Assert
-      const firstChild = (
-        tree.children?.slice() as TestRenderer.ReactTestRendererNode[]
-      )?.shift() as TestRenderer.ReactTestRendererJSON;
-      expect(firstChild.props.style.marginLeft).toBeFalsy();
-
-      const lastChild = (
-        tree.children?.slice() as TestRenderer.ReactTestRendererNode[]
-      )?.pop() as TestRenderer.ReactTestRendererJSON;
-      expect(lastChild.props.style?.marginLeft).toBe(gap / 2);
-      expect(lastChild.props.style?.marginRight).toBeFalsy();
-
-      expect(allMiddleSiblingsHaveStyle(tree.children, 'marginLeft', gap / 2)).toBeTruthy();
-      expect(allMiddleSiblingsHaveStyle(tree.children, 'marginRight', gap / 2)).toBeTruthy();
-    });
-
-    it(`children should have left margins (except for first child) and no right margins on all
-  children for hRight`, () => {
-      const gap = 10;
-      act(() => {
-        instance = TestRenderer.create(
-          <FmRow hRight gap={gap}>
-            <div></div>
-            <p>Hello</p>
-            <div></div>
-          </FmRow>
-        );
-      });
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      // Assert
-      expect(noRightMargins(tree.children)).toBeTruthy();
-      expect(allHaveLeftMarginsExceptFirstChild(tree.children, gap)).toBeTruthy();
     });
   });
 
-  describe('children', () => {
-    let instance: TestRenderer.ReactTestRenderer;
-
+  describe('styles on child elements', () => {
     it('should allow styles to be specified directly on child elements', async () => {
       const divStyle: { [key: string]: any } = {
         backgroundColor: 'green',
@@ -389,7 +411,7 @@ describe('<FmRow />', () => {
       };
 
       act(() => {
-        instance = TestRenderer.create(
+        renderer = TestRenderer.create(
           <FmRow gap={10}>
             <div style={divStyle} className={'myDiv'}></div>
             <p style={pStyle} className={'myP'}>
@@ -401,7 +423,7 @@ describe('<FmRow />', () => {
       });
 
       // Assert - all div's should have the div styles
-      const divEls = await instance.root.findAllByProps({ className: 'myDiv' });
+      const divEls = await renderer.root.findAllByProps({ className: 'myDiv' });
       divEls.forEach((divEl) => {
         Object.keys(divStyle).forEach((styleName) => {
           expect(divEl.props.style[styleName]).toBe(divStyle[styleName]);
@@ -409,7 +431,7 @@ describe('<FmRow />', () => {
       });
 
       // Assert - all p elements should have the paragraph styles
-      const pEls = await instance.root.findAllByProps({ className: 'myP' });
+      const pEls = await renderer.root.findAllByProps({ className: 'myP' });
       pEls.forEach((pEl) => {
         Object.keys(pStyle).forEach((styleName) => {
           expect(pEl.props.style[styleName]).toBe(pStyle[styleName]);
@@ -429,7 +451,7 @@ describe('<FmRow />', () => {
       };
 
       act(() => {
-        instance = TestRenderer.create(
+        renderer = TestRenderer.create(
           <FmRow gap={origMarginRight}>
             <div style={divStyle}></div>
             <p style={pStyle}>Hello</p>
@@ -438,7 +460,7 @@ describe('<FmRow />', () => {
         );
       });
 
-      const tree = instance.toJSON() as TestRenderer.ReactTestRendererJSON;
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
 
       // Assert
       tree.children?.forEach((child) => {

@@ -93,7 +93,7 @@ export const FmColumn: React.FC<FmColumnProps> = (props) => {
   }, []);
 
   return (
-    <div style={{ ...containerStyles, ...props.style }}>
+    <div className={props.className} style={{ ...containerStyles, ...props.style }}>
       {React.Children.map(props.children, (child, i) => {
         if (isEl(child)) {
           let mergedStyles = {

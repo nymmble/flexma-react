@@ -221,7 +221,75 @@ describe('<FmColumn />', () => {
     });
   });
 
-  describe('child styles', () => {
+  describe('inputs to the component', () => {
+    it('should support having no children', () => {
+      act(() => {
+        renderer = TestRenderer.create(<FmColumn></FmColumn>);
+      });
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+      expect(tree.children).toBeFalsy();
+    });
+
+    it('should support passed in contents as children', () => {
+      act(() => {
+        renderer = TestRenderer.create(
+          <FmColumn>
+            foo
+            <div></div>
+          </FmColumn>
+        );
+      });
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+      expect(tree.children?.length).toBe(2);
+    });
+
+    it('should allow passed in styles to override default styles', () => {
+      // Override - It wouldn't actually make sense to override the flexDirection this way,
+      // this is just a test to ensure default styles can be overwritten.
+      act(() => {
+        renderer = TestRenderer.create(<FmColumn style={{ flexDirection: 'row' }}></FmColumn>);
+      });
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+      expect(tree.props.style.flexDirection).toBe('row');
+    });
+
+    it('should not overwrite defaults for styles that were not passed in', () => {
+      act(() => {
+        renderer = TestRenderer.create(<FmColumn style={{ flexDirection: 'row' }}></FmColumn>);
+      });
+      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+      expect(tree.props.style.display).toBe('flex');
+    });
+
+    describe('props', () => {
+      it('should not specify a className prop if none was passed in', () => {
+        act(() => {
+          renderer = TestRenderer.create(<FmColumn></FmColumn>);
+        });
+        const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        expect(tree.props.className).not.toBeDefined();
+      });
+
+      it('should use the passed in className prop', () => {
+        const customClassName = 'myClass';
+
+        act(() => {
+          renderer = TestRenderer.create(<FmColumn className={customClassName}></FmColumn>);
+        });
+        const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
+
+        expect(tree.props.className).toBeDefined();
+        expect(tree.props.className).toBe(customClassName);
+      });
+    });
+  });
+
+  describe('styles on child elements', () => {
     it('should allow styles to be specified directly on child elements', async () => {
       const divStyle: { [key: string]: any } = {
         backgroundColor: 'green',
@@ -288,51 +356,6 @@ describe('<FmColumn />', () => {
 
       // Assert
       expect(allHaveBottomMarginsExceptLast(tree.children, newMarginBottom)).toBeTruthy();
-    });
-  });
-
-  describe('inputs', () => {
-    it('should support having no children', () => {
-      act(() => {
-        renderer = TestRenderer.create(<FmColumn></FmColumn>);
-      });
-      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      expect(tree.children).toBeFalsy();
-    });
-
-    it('should support passed in contents as children', () => {
-      act(() => {
-        renderer = TestRenderer.create(
-          <FmColumn>
-            foo
-            <div></div>
-          </FmColumn>
-        );
-      });
-      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      expect(tree.children?.length).toBe(2);
-    });
-
-    it('should allow passed in styles to override default styles', () => {
-      // Override - It wouldn't actually make sense to override the flexDirection this way,
-      // this is just a test to ensure default styles can be overwritten.
-      act(() => {
-        renderer = TestRenderer.create(<FmColumn style={{ flexDirection: 'row' }}></FmColumn>);
-      });
-      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      expect(tree.props.style.flexDirection).toBe('row');
-    });
-
-    it('should not overwrite defaults for styles that were not passed in', () => {
-      act(() => {
-        renderer = TestRenderer.create(<FmColumn style={{ flexDirection: 'row' }}></FmColumn>);
-      });
-      const tree = renderer.toJSON() as TestRenderer.ReactTestRendererJSON;
-
-      expect(tree.props.style.display).toBe('flex');
     });
   });
 });
